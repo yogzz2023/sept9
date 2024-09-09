@@ -1,0 +1,189 @@
+A **State Transition Diagram** would be ideal for visualizing how the system transitions between different states, particularly how tracks evolve through different conditions like "tentative" and "firm" based on hits and misses. In your code, tracks can either:
+- Start as tentative,
+- Become firm if they meet certain conditions (like Doppler correlation and range satisfaction),
+- Or be removed if they accumulate too many misses.
+
+### Analysis for State Transition Diagram:
+
+**States**:
+1. **New Track**: A new track is created when a measurement does not match any existing track.
+2. **Tentative Track**: A track that is newly initiated and hasn't yet met the criteria for being firm.
+3. **Firm Track**: A track that has met the firm threshold, meaning it has enough hits.
+4. **Removed Track**: A track that is deleted due to too many misses.
+
+**Transitions**:
+- **New Track → Tentative Track**: When a new measurement starts a new track.
+- **Tentative Track → Firm Track**: When a tentative track accumulates enough hits to meet the firm threshold.
+- **Tentative Track → Removed Track**: When a tentative track accumulates too many misses.
+- **Firm Track**: A firm track remains firm but can continue to receive hits or misses.
+- **Firm Track → Removed Track**: If you decide to remove firm tracks after too many misses, though this is optional based on your logic.
+
+Here’s the code for a State Transition Diagram in **PlantUML** and **Mermaid**.
+
+### PlantUML Code for State Transition Diagram:
+
+```plantuml
+@startuml
+[*] --> NewTrack : Start Measurement
+NewTrack --> TentativeTrack : Measurement initiates new track
+TentativeTrack --> FirmTrack : Enough hits, meets firm threshold
+TentativeTrack --> RemovedTrack : Too many misses
+FirmTrack --> RemovedTrack : Optional, too many misses
+
+TentativeTrack --> TentativeTrack : Hits or Misses
+FirmTrack --> FirmTrack : Hits or Misses
+@enduml
+```
+
+### Mermaid Code for State Transition Diagram:
+
+```mermaid
+stateDiagram
+    [*] --> NewTrack: Start Measurement
+    NewTrack --> TentativeTrack: Measurement initiates new track
+    TentativeTrack --> FirmTrack: Enough hits, meets firm threshold
+    TentativeTrack --> RemovedTrack: Too many misses
+    FirmTrack --> RemovedTrack: Optional, too many misses
+
+    TentativeTrack --> TentativeTrack: Hits or Misses
+    FirmTrack --> FirmTrack: Hits or Misses
+```
+
+### How to Visualize:
+
+1. **Using PlantUML**:
+   - Go to [PlantText.com](https://www.planttext.com/).
+   - Paste the PlantUML code into the editor.
+   - Click "Refresh" to generate the diagram.
+
+2. **Using Mermaid**:
+   - Visit [Mermaid Live Editor](https://mermaid-js.github.io/mermaid-live-editor/).
+   - Paste the Mermaid code into the editor.
+   - View the state diagram in real-time.
+
+### Diagram Explanation:
+- The state diagram starts at the **New Track** state when a measurement doesn't match any existing track.
+- The system transitions to the **Tentative Track** state, where it remains until it either receives enough hits to become **Firm** or accumulates too many misses, causing it to be removed.
+- A **Firm Track** can either continue receiving hits or be removed if your logic dictates that too many misses should remove a firm track.
+
+This diagram models how tracks evolve as new measurements come in and how the system handles hits and misses. Let me know if you want any adjustments!
+
+
+
+
+To create a **very detailed state transition diagram** for your tracking system, we'll expand on the previously outlined states, transitions, and actions that occur during each transition. The system will include more specifics about how hits, misses, and various conditions (Doppler correlation and range gate) influence track state transitions.
+
+### Key States:
+
+1. **New Track**:
+   - This is the initial state when a measurement doesn't match any existing track.
+   - A new track is initiated and classified as **tentative**.
+
+2. **Tentative Track**:
+   - The track is tentative because it hasn't yet accumulated enough consistent measurements (hits).
+   - The system keeps track of **hit counts** and **miss counts**.
+
+3. **Firm Track**:
+   - A track becomes firm when it accumulates enough hits to meet the **firm threshold**.
+   - Firm tracks are more reliable and are retained even if they miss some measurements.
+
+4. **Miss Threshold Exceeded**:
+   - If a track accumulates too many consecutive misses, it may be removed or reset, depending on system logic.
+   - This state could apply to both **tentative** and **firm** tracks (optional for firm tracks).
+
+5. **Track Removed**:
+   - A track is deleted after exceeding a miss threshold, and its data is no longer considered.
+
+### Transitions:
+
+1. **New Track → Tentative Track**: 
+   - When a new measurement doesn't match any existing track, a **new track** is created and moves to the **Tentative Track** state.
+   
+2. **Tentative Track → Tentative Track**: 
+   - If a measurement matches an existing tentative track based on Doppler correlation or range gate (or both), the **hit count** increases.
+   - If the conditions aren't fully met, it either continues as tentative or gains a **miss count**.
+
+3. **Tentative Track → Firm Track**:
+   - When a tentative track accumulates enough hits (meets the firm threshold), it becomes a **Firm Track**.
+   
+4. **Tentative Track → Miss Threshold Exceeded**:
+   - If the tentative track accumulates too many misses (exceeding the miss threshold), it transitions to the **Miss Threshold Exceeded** state.
+
+5. **Firm Track → Firm Track**:
+   - A firm track continues to receive hits or misses, but it stays in the **Firm Track** state unless too many consecutive misses occur.
+   
+6. **Firm Track → Miss Threshold Exceeded (Optional)**:
+   - This is an optional state. If a firm track accumulates too many misses, it may transition to the **Miss Threshold Exceeded** state for removal or other actions.
+
+7. **Miss Threshold Exceeded → Track Removed**:
+   - If the track accumulates too many misses and exceeds the miss threshold, it is **removed**.
+
+### Detailed PlantUML Code:
+
+```plantuml
+@startuml
+[*] --> NewTrack : Measurement does not match any track
+NewTrack --> TentativeTrack : New track initialized
+TentativeTrack --> TentativeTrack : Doppler or range conditions partially satisfied \nHit or Miss Incremented
+TentativeTrack --> FirmTrack : Enough hits, meets firm threshold
+TentativeTrack --> MissThresholdExceeded : Too many misses, exceeds miss threshold
+FirmTrack --> FirmTrack : Continued hits or occasional misses
+FirmTrack --> MissThresholdExceeded : Too many consecutive misses (optional)
+MissThresholdExceeded --> TrackRemoved : Track deleted due to too many misses
+@enduml
+```
+
+### Detailed Mermaid Code:
+
+```mermaid
+stateDiagram
+    [*] --> NewTrack: Measurement does not match any track
+    NewTrack --> TentativeTrack: New track initialized
+    TentativeTrack --> TentativeTrack: Doppler or range conditions partially satisfied\nHit or Miss Incremented
+    TentativeTrack --> FirmTrack: Enough hits, meets firm threshold
+    TentativeTrack --> MissThresholdExceeded: Too many misses, exceeds miss threshold
+    FirmTrack --> FirmTrack: Continued hits or occasional misses
+    FirmTrack --> MissThresholdExceeded: Too many consecutive misses (optional)
+    MissThresholdExceeded --> TrackRemoved: Track deleted due to too many misses
+```
+
+### Explanation of Each State and Transition in Detail:
+
+1. **New Track**:
+   - A measurement that doesn't match any current track in the system results in the creation of a **new track**. This new track is initially in a tentative state.
+
+2. **Tentative Track**:
+   - In the **Tentative Track** state, the system checks two main conditions:
+     1. **Doppler correlation**: Whether the Doppler measurement of the current observation is within the Doppler threshold when compared to the last Doppler measurement.
+     2. **Range gate**: Whether the Cartesian distance between the current measurement and the last measurement is within the range threshold.
+   - If both Doppler and range conditions are satisfied, the hit count for this track increases, and it remains in the **Tentative Track** state until enough hits are accumulated to become a **Firm Track**.
+
+3. **Firm Track**:
+   - Once a track accumulates enough **hits**, it becomes a **Firm Track**. A firm track is more reliable because it has consistently matched measurements across several observations. 
+   - A firm track may continue to receive hits or occasional misses. If it accumulates too many consecutive misses, it might transition to **Miss Threshold Exceeded** (optional based on your logic).
+
+4. **Miss Threshold Exceeded**:
+   - Both tentative and firm tracks may transition to this state if they accumulate too many consecutive misses. 
+   - **Tentative tracks** transition here if they fail to receive enough hits within the miss threshold window.
+   - **Firm tracks** may optionally transition here if you decide to remove firm tracks after too many misses.
+
+5. **Track Removed**:
+   - Once the miss threshold has been exceeded for any track, the system transitions the track to the **Track Removed** state, where the track is deleted from the system. It is no longer tracked, and its data is discarded.
+
+### Additional Considerations:
+- The system favors **Doppler correlation** over range conditions when both are not met.
+- If the Doppler condition is satisfied but the range condition isn't, the system might still assign the measurement to the track.
+- **Miss counts** are incremented when a track fails to correlate with any measurement.
+- A track becomes **firm** only after consistently matching measurements over a given period (i.e., number of hits).
+
+### How to Visualize:
+
+1. **Using PlantUML**:
+   - Copy the PlantUML code into [PlantText.com](https://www.planttext.com/).
+   - Click "Refresh" to generate the diagram.
+
+2. **Using Mermaid**:
+   - Go to [Mermaid Live Editor](https://mermaid-js.github.io/mermaid-live-editor/).
+   - Paste the Mermaid code into the editor and visualize the diagram.
+
+This detailed **State Transition Diagram** outlines the entire flow of how tracks are initialized, evolve between states based on measurement conditions, and are eventually removed if they fail to meet thresholds.
